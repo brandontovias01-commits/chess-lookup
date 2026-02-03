@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess.com Username Lookup</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div class="container" id="main-content">
+        <header>
+            <div class="header-top">
+                <h1>♟️ Chess.com Username Lookup</h1>
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
+            <p class="subtitle">Search for comprehensive player data</p>
+        </header>
+
+        <div class="search-section">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="usernameInput" 
+                    placeholder="Enter Chess.com username..."
+                    autocomplete="off"
+                    aria-label="Chess.com username"
+                    aria-describedby="username-help"
+                >
+                <span id="username-help" class="sr-only">Enter a valid Chess.com username to search</span>
+                <button id="searchButton" class="search-btn" aria-label="Search">Search</button>
+                <button id="compareButton" class="compare-btn" aria-label="Compare players" title="Compare two players">Compare</button>
+            </div>
+            <div id="recentSearches" class="recent-searches" style="display: none;">
+                <div class="recent-searches-header">
+                    <span>Recent searches:</span>
+                    <button id="clearHistory" class="clear-history-btn" aria-label="Clear search history">Clear</button>
+                </div>
+                <div id="recentSearchesList" class="recent-searches-list"></div>
+            </div>
+            <div id="errorMessage" class="error-message" style="display: none;" role="alert"></div>
+            <div id="toast" class="toast" style="display: none;" role="status" aria-live="polite"></div>
+        </div>
+
+        <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+            <div class="spinner"></div>
+            <p>Fetching player data...</p>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div id="resultsContainer" class="results-container" style="display: none;">
+            <!-- Comparison View -->
+            <div id="comparisonContainer" class="comparison-container" style="display: none;">
+                <div class="comparison-header">
+                    <h2>Player Comparison</h2>
+                    <button id="closeComparison" class="close-comparison-btn" aria-label="Close comparison">×</button>
+                </div>
+                <div id="comparisonContent" class="comparison-content"></div>
+            </div>
+
+            <!-- Profile Section -->
+            <section id="profileSection" class="data-section">
+                <h2 class="section-header">
+                    <span>Profile</span>
+                    <div class="section-actions">
+                        <button id="exportProfileBtn" class="action-btn" title="Export profile data" aria-label="Export profile">📥</button>
+                        <button class="toggle-btn" data-section="profile" aria-label="Toggle profile section">▼</button>
+                    </div>
+                </h2>
+                <div id="profileContent" class="section-content"></div>
+            </section>
+
+            <!-- Statistics Section -->
+            <section id="statsSection" class="data-section">
+                <h2 class="section-header">
+                    <span>Statistics</span>
+                    <div class="section-actions">
+                        <button class="toggle-btn" data-section="stats" aria-label="Toggle statistics section">▼</button>
+                    </div>
+                </h2>
+                <div id="statsContent" class="section-content">
+                    <div id="ratingCharts" class="rating-charts"></div>
+                    <div id="performanceMetrics" class="performance-metrics"></div>
+                </div>
+            </section>
+
+            <!-- Recent Games Section -->
+            <section id="gamesSection" class="data-section">
+                <h2 class="section-header">
+                    <span>Recent Games</span>
+                    <div class="section-actions">
+                        <button class="toggle-btn" data-section="games" aria-label="Toggle games section">▼</button>
+                    </div>
+                </h2>
+                <div id="gamesContent" class="section-content">
+                    <div id="gameFilters" class="game-filters" style="display: none;">
+                        <select id="filterTimeControl" class="filter-select" aria-label="Filter by time control">
+                            <option value="">All Time Controls</option>
+                            <option value="blitz">Blitz</option>
+                            <option value="bullet">Bullet</option>
+                            <option value="rapid">Rapid</option>
+                            <option value="daily">Daily</option>
+                        </select>
+                        <select id="filterResult" class="filter-select" aria-label="Filter by result">
+                            <option value="">All Results</option>
+                            <option value="win">Wins</option>
+                            <option value="loss">Losses</option>
+                            <option value="draw">Draws</option>
+                        </select>
+                        <select id="sortGames" class="filter-select" aria-label="Sort games">
+                            <option value="date-desc">Date (Newest)</option>
+                            <option value="date-asc">Date (Oldest)</option>
+                            <option value="rating-desc">Opponent Rating (High)</option>
+                            <option value="rating-asc">Opponent Rating (Low)</option>
+                        </select>
+                        <button id="resetFilters" class="reset-filters-btn" aria-label="Reset filters">Reset</button>
+                    </div>
+                    <div id="gamesListContainer"></div>
+                    <div id="gamesPagination" class="games-pagination" style="display: none;"></div>
+                </div>
+            </section>
+
+            <!-- Tournaments Section -->
+            <section id="tournamentsSection" class="data-section">
+                <h2 class="section-header">
+                    <span>Tournaments</span>
+                    <button class="toggle-btn" data-section="tournaments">▼</button>
+                </h2>
+                <div id="tournamentsContent" class="section-content"></div>
+            </section>
+
+            <!-- Clubs Section -->
+            <section id="clubsSection" class="data-section">
+                <h2 class="section-header">
+                    <span>Clubs</span>
+                    <button class="toggle-btn" data-section="clubs">▼</button>
+                </h2>
+                <div id="clubsContent" class="section-content"></div>
+            </section>
+
+            <!-- Matches Section -->
+            <section id="matchesSection" class="data-section">
+                <h2 class="section-header">
+                    <span>Matches</span>
+                    <button class="toggle-btn" data-section="matches">▼</button>
+                </h2>
+                <div id="matchesContent" class="section-content"></div>
+            </section>
+
+            <!-- Raw API Data Section -->
+            <section id="rawDataSection" class="data-section">
+                <h2 class="section-header">
+                    <span>Raw API Data</span>
+                    <div class="section-actions">
+                        <button id="copyRawDataBtn" class="action-btn" title="Copy raw data" aria-label="Copy raw data">📋</button>
+                        <button class="toggle-btn" data-section="rawData" aria-label="Toggle raw data section">▼</button>
+                    </div>
+                </h2>
+                <div id="rawDataContent" class="section-content">
+                    <pre id="rawDataDisplay" class="json-viewer"></pre>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
